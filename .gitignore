@@ -1,1 +1,4 @@
 build*
+extractor/descent.hog
+extractor/hmq_dump
+stage

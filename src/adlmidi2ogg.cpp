@@ -10,7 +10,7 @@
 // Generated with GPT
 int main()
 {
-    const char* midiFile = "descent.mid";
+    const char* midiFile = "descent.hmq";
     const char* outFile  = "descent.ogg";
 
     const int sampleRate = 48000;
@@ -51,7 +51,7 @@ int main()
 
     vorbis_comment vc;
     vorbis_comment_init(&vc);
-    vorbis_comment_add_tag(&vc, "ENCODER", "libADLMIDI example");
+    vorbis_comment_add_tag(&vc, "ENCODER", "libadlmidi 24bit vorbis");
 
     vorbis_dsp_state vd;
     vorbis_analysis_init(&vd, &vi);
@@ -87,20 +87,30 @@ int main()
     // -------------------------
     // Render + encode loop
     // -------------------------
+
     const int BUFFER = 1024;
+    // Size is BUFFER frames * 2 channels = 2048 shorts total
     std::vector<short> pcm(BUFFER * channels);
 
-    while(adl_play(player, BUFFER, pcm.data()) > 0)
-    {
-        float **buffer = vorbis_analysis_buffer(&vd, BUFFER);
+    int samplesGenerated = 0;
 
-        for(int i=0;i<BUFFER;i++)
+    // Pass BUFFER * channels to request a full buffer of shorts
+    while((samplesGenerated = adl_play(player, BUFFER * channels, pcm.data())) > 0)
+    {
+        // Convert the total number of shorts generated into stereo frames
+        int framesGenerated = samplesGenerated / channels;
+
+        // Ask Vorbis ONLY for the frames we actually generated
+        float **buffer = vorbis_analysis_buffer(&vd, framesGenerated);
+
+        for(int i = 0; i < framesGenerated; i++)
         {
-            buffer[0][i] = pcm[i*2] / 32768.f;
-            buffer[1][i] = pcm[i*2+1] / 32768.f;
+            buffer[0][i] = pcm[i*2]     / 32768.f;
+            buffer[1][i] = pcm[i*2 + 1] / 32768.f;
         }
 
-        vorbis_analysis_wrote(&vd, BUFFER);
+        // Tell Vorbis exactly how many frames we wrote
+        vorbis_analysis_wrote(&vd, framesGenerated);
 
         while(vorbis_analysis_blockout(&vd, &vb) == 1)
         {
