@@ -3,6 +3,8 @@
 #include <vorbis/vorbisenc.h>
 #include <ogg/ogg.h>
 
+#include <algorithm>
+#include <cfloat>
 #include <fstream>
 #include <vector>
 #include <iostream>
@@ -32,8 +34,11 @@ int main()
         return 1;
     }
 
+    adl_switchEmulator(player, ADLMIDI_EMU_NUKED);
+    //adl_setVolumeRangeModel(player, ADLMIDI_VolumeModel_Generic);
     adl_setBank(player, 4);
     adl_setNumChips(player, 2);
+    adl_setSoftPanEnabled(player, 1);
 
     // -------------------------
     // Init Vorbis encoder
@@ -41,7 +46,7 @@ int main()
     vorbis_info vi;
     vorbis_info_init(&vi);
 
-    float quality = 0.5f;
+    float quality = 1.0f;
 
     if(vorbis_encode_init_vbr(&vi, channels, sampleRate, quality))
     {
@@ -97,6 +102,9 @@ int main()
     // Therefore, the stride to the next sample in the array is just 1 float.
     format.sampleOffset  = sizeof(float);
 
+    // Inspired by dxxrebirth which has become the "natural" sound for me now
+    const auto amplify = [](float i) { return std::clamp(2.0f * i, -1.0f, 1.0f); };
+
     while (true)
     {
         float **buffer = vorbis_analysis_buffer(&vd, BUFFER_FRAMES);
@@ -109,6 +117,10 @@ int main()
 
         if (samplesGenerated <= 0)
             break; // End of MIDI
+
+	// Apply amplification to make it punchy
+	std::transform(buffer[0], buffer[0] + samplesGenerated, buffer[0], amplify);
+	std::transform(buffer[1], buffer[1] + samplesGenerated, buffer[1], amplify);
 
 	int framesGenerated = samplesGenerated / channels;
         vorbis_analysis_wrote(&vd, framesGenerated);

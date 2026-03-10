@@ -11,6 +11,8 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(VORBIS REQUIRED vorbis vorbisenc)
 pkg_check_modules(OGG REQUIRED ogg)
 
+# We want the highest quality possible for offline rendering
+set(WITH_HQ_RESAMPLER ON CACHE BOOL "" FORCE)
 add_subdirectory(ext/libadlmidi)
 
 add_executable(midi2ogg
@@ -25,6 +27,7 @@ target_include_directories(midi2ogg PRIVATE
 
 target_link_libraries(midi2ogg
     ADLMIDI_static
+    zita-resampler
     ${VORBIS_LIBRARIES}
     ${OGG_LIBRARIES}
 )
