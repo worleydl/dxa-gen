@@ -35,7 +35,8 @@ int main()
     }
 
     adl_switchEmulator(player, ADLMIDI_EMU_NUKED);
-    //adl_setVolumeRangeModel(player, ADLMIDI_VolumeModel_Generic);
+    adl_setChannelAllocMode(player, ADLMIDI_ChanAlloc_AnyReleased);
+    adl_setVolumeRangeModel(player, ADLMIDI_VolumeModel_HMI);
     adl_setBank(player, 4);
     adl_setNumChips(player, 2);
     adl_setSoftPanEnabled(player, 1);
