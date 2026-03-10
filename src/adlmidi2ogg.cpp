@@ -51,7 +51,7 @@ int main()
 
     vorbis_comment vc;
     vorbis_comment_init(&vc);
-    vorbis_comment_add_tag(&vc, "ENCODER", "libadlmidi 24bit vorbis");
+    vorbis_comment_add_tag(&vc, "ENCODER", "libadlmidi to vorbis");
 
     vorbis_dsp_state vd;
     vorbis_analysis_init(&vd, &vi);
@@ -87,29 +87,30 @@ int main()
     // -------------------------
     // Render + encode loop
     // -------------------------
+    const int BUFFER_FRAMES = 1024;
 
-    const int BUFFER = 1024;
-    // Size is BUFFER frames * 2 channels = 2048 shorts total
-    std::vector<short> pcm(BUFFER * channels);
+    // Configure libADLMIDI to output 32-bit Float
+    ADLMIDI_AudioFormat format;
+    format.type = ADLMIDI_SampleType_F32;
+    format.containerSize = sizeof(float);
+    // Vorbis uses separate, non-interleaved arrays for L and R.
+    // Therefore, the stride to the next sample in the array is just 1 float.
+    format.sampleOffset  = sizeof(float);
 
-    int samplesGenerated = 0;
-
-    // Pass BUFFER * channels to request a full buffer of shorts
-    while((samplesGenerated = adl_play(player, BUFFER * channels, pcm.data())) > 0)
+    while (true)
     {
-        // Convert the total number of shorts generated into stereo frames
-        int framesGenerated = samplesGenerated / channels;
+        float **buffer = vorbis_analysis_buffer(&vd, BUFFER_FRAMES);
 
-        // Ask Vorbis ONLY for the frames we actually generated
-        float **buffer = vorbis_analysis_buffer(&vd, framesGenerated);
+        int samplesGenerated = adl_playFormat(player, 
+                                             BUFFER_FRAMES * channels, 
+                                             (ADL_UInt8*)buffer[0], // Left channel
+                                             (ADL_UInt8*)buffer[1], // Right channel
+                                             &format);
 
-        for(int i = 0; i < framesGenerated; i++)
-        {
-            buffer[0][i] = pcm[i*2]     / 32768.f;
-            buffer[1][i] = pcm[i*2 + 1] / 32768.f;
-        }
+        if (samplesGenerated <= 0)
+            break; // End of MIDI
 
-        // Tell Vorbis exactly how many frames we wrote
+	int framesGenerated = samplesGenerated / channels;
         vorbis_analysis_wrote(&vd, framesGenerated);
 
         while(vorbis_analysis_blockout(&vd, &vb) == 1)
@@ -148,3 +149,4 @@ int main()
 
     std::cout << "Finished writing OGG\n";
 }
+
