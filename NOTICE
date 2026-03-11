@@ -1,0 +1,8 @@
+This project uses libADLMIDI.
+
+All non libADLMIDI code is available under The Unlicense
+
+libADLMIDI is licensed under a combination of GPL3 and LGPL2/3, if you distribute this binary you may need to make customizations to the available emulation backends as each has their own license.
+ 
+See the libADLMIDI project for more details:
+https://github.com/Wohlstand/libADLMIDI
