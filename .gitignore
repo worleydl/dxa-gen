@@ -1,4 +1,6 @@
 build*
 extractor/descent.hog
 extractor/hmq_dump
+hmq_dump
 stage
+staging_dxa

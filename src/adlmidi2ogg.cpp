@@ -10,10 +10,15 @@
 #include <iostream>
 
 // Generated with GPT
-int main()
+int main(int argc, char** argv)
 {
-    const char* midiFile = "descent.hmq";
-    const char* outFile  = "descent.ogg";
+    if (argc < 4) {
+        std::cerr << "Usage: [input] [output] [bank #]\n";
+        return 1;
+    }
+
+    const char* midiFile = argv[1]; //"descent.hmq";
+    const char* outFile  = argv[2]; //"descent.ogg";
 
     const int sampleRate = 48000;
     const int channels   = 2;
@@ -37,7 +42,7 @@ int main()
     adl_switchEmulator(player, ADLMIDI_EMU_NUKED);
     adl_setChannelAllocMode(player, ADLMIDI_ChanAlloc_AnyReleased);
     adl_setVolumeRangeModel(player, ADLMIDI_VolumeModel_HMI);
-    adl_setBank(player, 4);
+    adl_setBank(player, std::stoi(argv[3]));
     adl_setNumChips(player, 2);
     adl_setSoftPanEnabled(player, 1);
 
