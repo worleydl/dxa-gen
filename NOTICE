@@ -11,3 +11,27 @@ libADLMIDI is licensed under a combination of GPL3 and LGPL2/3, if you distribut
  
 See the libADLMIDI project for more details:
 https://github.com/Wohlstand/libADLMIDI
+
+---
+
+This project also uses vorbis and ogg
+
+Copyright (c) 2002, Xiph.Org Foundation. All rights reserved.
+
+Licensed under a BSD-style license.  
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
+PURPOSE ARE DISCLAIMED.
+
+Project homepage: https://xiph.org/ogg/
+Project homepage: https://xiph.org/vorbis/
+
+---
+
+Last but not least, if WITH_HQ_RESAMPLER is enabled you must abide by GPL3 conditions due to zita-resampler linkage.
+
+zita-resampler
+Licensed under GPL3
+Project homepage: https://github.com/digital-stage/zita-resampler
