@@ -115,7 +115,7 @@ int main(int argc, char** argv)
         float **buffer = vorbis_analysis_buffer(&vd, BUFFER_FRAMES);
 
         int samplesGenerated = adl_playFormat(player, 
-                                             BUFFER_FRAMES,
+                                             BUFFER_FRAMES * channels,
                                              (ADL_UInt8*)buffer[0], // Left channel
                                              (ADL_UInt8*)buffer[1], // Right channel
                                              &format);
