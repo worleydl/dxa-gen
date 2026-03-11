@@ -2,6 +2,11 @@ This project uses libADLMIDI.
 
 All non libADLMIDI code is available under The Unlicense
 
+libADLMIDI is a free Software MIDI synthesizer library with OPL3 emulation
+
+Original ADLMIDI code: Copyright (c) 2010-2014 Joel Yliluoma bisqwit@iki.fi
+ADLMIDI Library API: Copyright (c) 2015-2026 Vitaly Novichkov admin@wohlnet.ru
+
 libADLMIDI is licensed under a combination of GPL3 and LGPL2/3, if you distribute this binary you may need to make customizations to the available emulation backends as each has their own license.
  
 See the libADLMIDI project for more details:
