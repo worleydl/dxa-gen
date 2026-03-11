@@ -9,7 +9,8 @@
 #include <vector>
 #include <iostream>
 
-// Generated with GPT
+// Scaffolded by GPT, optimized by worleydl
+// arg parsing is very minimal/likely prone to breakage
 int main(int argc, char** argv)
 {
     if (argc < 4) {
