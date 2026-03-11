@@ -47,7 +47,7 @@ int main()
     vorbis_info vi;
     vorbis_info_init(&vi);
 
-    float quality = 1.0f;
+    float quality = 0.6f;
 
     if(vorbis_encode_init_vbr(&vi, channels, sampleRate, quality))
     {
@@ -96,11 +96,10 @@ int main()
     const int BUFFER_FRAMES = 1024;
 
     // Configure libADLMIDI to output 32-bit Float
+    // This hopefully avoids resampling internal to vorbis
     ADLMIDI_AudioFormat format;
     format.type = ADLMIDI_SampleType_F32;
     format.containerSize = sizeof(float);
-    // Vorbis uses separate, non-interleaved arrays for L and R.
-    // Therefore, the stride to the next sample in the array is just 1 float.
     format.sampleOffset  = sizeof(float);
 
     // Inspired by dxxrebirth which has become the "natural" sound for me now
@@ -111,7 +110,7 @@ int main()
         float **buffer = vorbis_analysis_buffer(&vd, BUFFER_FRAMES);
 
         int samplesGenerated = adl_playFormat(player, 
-                                             BUFFER_FRAMES * channels, 
+                                             BUFFER_FRAMES,
                                              (ADL_UInt8*)buffer[0], // Left channel
                                              (ADL_UInt8*)buffer[1], // Right channel
                                              &format);
@@ -119,11 +118,11 @@ int main()
         if (samplesGenerated <= 0)
             break; // End of MIDI
 
-	// Apply amplification to make it punchy
-	std::transform(buffer[0], buffer[0] + samplesGenerated, buffer[0], amplify);
-	std::transform(buffer[1], buffer[1] + samplesGenerated, buffer[1], amplify);
+        // Apply amplification to make it punchy (dxx rebirth adlmidi reference)
+        std::transform(buffer[0], buffer[0] + samplesGenerated, buffer[0], amplify);
+        std::transform(buffer[1], buffer[1] + samplesGenerated, buffer[1], amplify);
 
-	int framesGenerated = samplesGenerated / channels;
+        int framesGenerated = samplesGenerated / channels;
         vorbis_analysis_wrote(&vd, framesGenerated);
 
         while(vorbis_analysis_blockout(&vd, &vb) == 1)
